@@ -47,8 +47,15 @@ kea_dhcp_multi_threading_enable: true
 kea_dhcp4_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 kea_dhcp6_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 
-kea_dhcp4_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 8 else 8) | int }}"
-kea_dhcp6_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 6 else 6) | int }}"
+kea_dhcp4_multi_threading_pool_size: >-
+  {{ (ansible_facts['processor_vcpus']
+      if ansible_facts['processor_vcpus'] < 8
+      else 8) | int }}
+
+kea_dhcp6_multi_threading_pool_size: >-
+  {{ (ansible_facts['processor_vcpus']
+      if ansible_facts['processor_vcpus'] < 6
+      else 6) | int }}
 
 kea_dhcp4_multi_threading_queue_size: "{{ (kea_dhcp4_multi_threading_pool_size | int * 7) | int }}"
 kea_dhcp6_multi_threading_queue_size: "{{ (kea_dhcp6_multi_threading_pool_size | int * 150) | int }}"
