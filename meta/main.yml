@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Jonas Alfredsson
   description: Ansible role to install and configure Kea DHCP server

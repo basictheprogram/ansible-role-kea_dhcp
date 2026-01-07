@@ -1,7 +1,7 @@
 #
 # Container options
 #
-
+---
 # Kea services that should be enabled
 kea_dhcp4_enabled: true
 kea_dhcp6_enabled: false
@@ -50,8 +50,8 @@ kea_dhcp6_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 kea_dhcp4_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 8 else 8) | int }}"
 kea_dhcp6_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 6 else 6) | int }}"
 
-kea_dhcp4_multi_threading_queue_size: "{{ (kea_dhcp4_multi_threading_pool_size|int * 7) | int }}"
-kea_dhcp6_multi_threading_queue_size: "{{ (kea_dhcp6_multi_threading_pool_size|int * 150) | int }}"
+kea_dhcp4_multi_threading_queue_size: "{{ (kea_dhcp4_multi_threading_pool_size | int * 7) | int }}"
+kea_dhcp6_multi_threading_queue_size: "{{ (kea_dhcp6_multi_threading_pool_size | int * 150) | int }}"
 
 # Leases
 kea_dhcp_parked_packet_limit: 128
@@ -62,11 +62,11 @@ kea_dhcp_valid_lifetime: 6000
 kea_dhcp4_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
 kea_dhcp6_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
 
-kea_dhcp_renew_timer: "{{ (kea_dhcp_valid_lifetime|float * 0.5) | int }}"
+kea_dhcp_renew_timer: "{{ (kea_dhcp_valid_lifetime | float * 0.5) | int }}"
 kea_dhcp4_renew_timer: "{{ kea_dhcp_renew_timer }}"
 kea_dhcp6_renew_timer: "{{ kea_dhcp_renew_timer }}"
 
-kea_dhcp_rebind_timer: "{{ (kea_dhcp_valid_lifetime|float * 0.85) | int }}"
+kea_dhcp_rebind_timer: "{{ (kea_dhcp_valid_lifetime | float * 0.85) | int }}"
 kea_dhcp4_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 kea_dhcp6_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 
@@ -91,8 +91,9 @@ kea_ctrl_agent_port: 8000
 # initial variables will affect all instances unless you change any of the
 # "kea_logging_raw_*" variables.
 #
-# NOTE: !unsafe here----▼    This is to not trip jinja templating with "{%".
-kea_logging_pattern: !unsafe "%D{%Y-%m-%d %H:%M:%S.%q} %-5p [%c/%i.%t] %m\n"
+# NOTE: Use literal block to avoid Jinja parsing of %{...}
+kea_logging_pattern: |
+  %D{%Y-%m-%d %H:%M:%S.%q} %-5p [%c/%i.%t] %m
 kea_logging_severity: "INFO"
 kea_logging_debuglevel: 0
 kea_logging_maxsize: 10485760  # 10 MB

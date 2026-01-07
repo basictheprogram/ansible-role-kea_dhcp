@@ -1,3 +1,4 @@
+---
 - name: "Create expected folders"
   ansible.builtin.file:
     state: directory
