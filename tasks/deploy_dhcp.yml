@@ -2,19 +2,29 @@
   ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '') }}"
-    owner: 'root'
-    group: '101'
-    mode: '0664'
+    owner: "root"
+    group: "101"
+    mode: "0664"
   loop:
     - "dhcp{{ outer_item.dhcp_ip_version }}.json.j2"
     - "subnet{{ outer_item.dhcp_ip_version }}.json.j2"
   register: kea_config
 
+- name: "Pull Kea DHCP{{ outer_item.dhcp_ip_version }} image"
+  community.docker.docker_image:
+    name: "{{ outer_item.container_image }}"
+    source: pull
+    force_source: false
+  register: kea_image_pull
+  retries: 3
+  delay: 15
+  until: kea_image_pull is not failed
+
 - name: "Start Kea DHCP{{ outer_item.dhcp_ip_version }} container"
   community.docker.docker_container:
     name: "{{ outer_item.container_name }}"
     image: "{{ outer_item.container_image }}"
-    pull: true
+    pull: missing
     state: started
     restart_policy: unless-stopped
     command: "{{ outer_item.container_command }}"
