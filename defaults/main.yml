@@ -37,7 +37,7 @@ kea_ctrl_agent_container_ports:
 #
 
 # Interface
-kea_dhcp_interfaces: ["*"]
+kea_dhcp_interfaces: [ "*" ]
 kea_dhcp4_interfaces: "{{ kea_dhcp_interfaces }}"
 kea_dhcp6_interfaces: "{{ kea_dhcp_interfaces }}"
 
