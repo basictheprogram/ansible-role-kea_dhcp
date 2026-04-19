@@ -11,6 +11,7 @@ kea_ctrl_agent_enabled: false
 kea_container_base_dir: "/srv/kea"
 
 # The IPv4 DHCP service
+kea_dhcp4_open_sockets_max_retries: 10
 kea_dhcp4_container_name: "kea-dhcp4"
 kea_dhcp4_container_image: "jonasal/kea-dhcp4:2"
 kea_dhcp4_container_command: "-c /kea/config/dhcp4.json"
@@ -31,13 +32,12 @@ kea_ctrl_agent_container_networks:
 kea_ctrl_agent_container_ports:
   - "{{ kea_ctrl_agent_port }}:{{ kea_ctrl_agent_port }}"
 
-
 #
 # DHCP configuration
 #
 
 # Interface
-kea_dhcp_interfaces: ['*']
+kea_dhcp_interfaces: ["*"]
 kea_dhcp4_interfaces: "{{ kea_dhcp_interfaces }}"
 kea_dhcp6_interfaces: "{{ kea_dhcp_interfaces }}"
 
@@ -47,11 +47,13 @@ kea_dhcp_multi_threading_enable: true
 kea_dhcp4_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 kea_dhcp6_multi_threading_enable: "{{ kea_dhcp_multi_threading_enable }}"
 
-kea_dhcp4_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 8 else 8) | int }}"
-kea_dhcp6_multi_threading_pool_size: "{{ (ansible_processor_vcpus if ansible_processor_vcpus < 6 else 6) | int }}"
+kea_dhcp4_multi_threading_pool_size: "{{ (ansible_facts['processor_vcpus'] if
+  ansible_facts['processor_vcpus'] < 8 else 8) | int }}"
+kea_dhcp6_multi_threading_pool_size: "{{ (ansible_facts['processor_vcpus'] if
+  ansible_facts['processor_vcpus'] < 6 else 6) | int }}"
 
-kea_dhcp4_multi_threading_queue_size: "{{ (kea_dhcp4_multi_threading_pool_size|int * 7) | int }}"
-kea_dhcp6_multi_threading_queue_size: "{{ (kea_dhcp6_multi_threading_pool_size|int * 150) | int }}"
+kea_dhcp4_multi_threading_queue_size: "{{ (kea_dhcp4_multi_threading_pool_size | int * 7) | int }}"
+kea_dhcp6_multi_threading_queue_size: "{{ (kea_dhcp6_multi_threading_pool_size | int * 150) | int }}"
 
 # Leases
 kea_dhcp_parked_packet_limit: 128
@@ -62,11 +64,11 @@ kea_dhcp_valid_lifetime: 6000
 kea_dhcp4_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
 kea_dhcp6_valid_lifetime: "{{ kea_dhcp_valid_lifetime }}"
 
-kea_dhcp_renew_timer: "{{ (kea_dhcp_valid_lifetime|float * 0.5) | int }}"
+kea_dhcp_renew_timer: "{{ (kea_dhcp_valid_lifetime | float * 0.5) | int }}"
 kea_dhcp4_renew_timer: "{{ kea_dhcp_renew_timer }}"
 kea_dhcp6_renew_timer: "{{ kea_dhcp_renew_timer }}"
 
-kea_dhcp_rebind_timer: "{{ (kea_dhcp_valid_lifetime|float * 0.85) | int }}"
+kea_dhcp_rebind_timer: "{{ (kea_dhcp_valid_lifetime | float * 0.85) | int }}"
 kea_dhcp4_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 kea_dhcp6_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 
@@ -74,14 +76,12 @@ kea_dhcp6_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 kea_dhcp4_subnets: []
 kea_dhcp6_subnets: []
 
-
 #
 # Control Agent configuration
 #
 
 kea_ctrl_agent_host: "0.0.0.0"
 kea_ctrl_agent_port: 8000
-
 
 #
 # Logging
@@ -95,7 +95,7 @@ kea_ctrl_agent_port: 8000
 kea_logging_pattern: !unsafe "%D{%Y-%m-%d %H:%M:%S.%q} %-5p [%c/%i.%t] %m\n"
 kea_logging_severity: "INFO"
 kea_logging_debuglevel: 0
-kea_logging_maxsize: 10485760  # 10 MB
+kea_logging_maxsize: 10485760 # 10 MB
 kea_logging_maxver: 3
 
 kea_logging_raw_dhcp4:
@@ -133,7 +133,6 @@ kea_logging_raw_ctrl_agent:
         pattern: "{{ kea_logging_pattern }}"
         maxsize: "{{ kea_logging_maxsize }}"
         maxver: "{{ kea_logging_maxver }}"
-
 
 #
 # Raw settings
