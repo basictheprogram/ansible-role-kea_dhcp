@@ -1,0 +1,65 @@
+{% macro render_domains(domains) %}
+{% for domain in domains %}
+{
+  "comment": "{{ domain.comment }}",
+  "name": "{{ domain.name }}",
+  "key-name": "kea-ddns-key",
+  "dns-servers": [
+{% for dns in domain.dns_servers %}
+    {
+      "ip-address": "{{ dns['ip-address'] }}",
+      "port": {{ dns.port | default(53) }}
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  ]
+}{% if not loop.last %},{% endif %}
+{% endfor %}
+{% endmacro %}
+
+{
+  "DhcpDdns":
+  {
+    "comment": "{{ kea_ddns.comment | default('DDNS configuration for Kea DHCPv4') }}",
+    "ip-address": "{{ kea_ddns_host }}",
+    "port": "{{ kea_ddns_port }}",
+    "dns-server-timeout": 1000,
+
+    "user-context": { "version": 1 },
+
+{% if kea_ctrl_agent_enabled %}
+        // Create a socket which the Control Agent may use to communicate.
+        "control-socket": {
+            "socket-type": "unix",
+            "socket-name": "/kea/sockets/dhcp4.socket"
+        },
+{% endif %}
+
+    "forward-ddns":
+    {
+      "ddns-domains":
+      [
+{{ render_domains(kea_forward_ddns) | trim | indent(8, first=True) }}
+      ]
+    },
+
+    "reverse-ddns":
+    {
+      "ddns-domains":
+      [
+{{ render_domains(kea_reverse_ddns) | trim | indent(8, first=True) }}
+      ]
+    },
+
+    "tsig-keys":
+    [
+      {
+        "name": "kea-ddns-key",
+        "algorithm": "hmac-sha256",
+        "secret": ""
+      }
+    ],
+
+    "loggers": {{ kea_logging_raw_ddns | to_nice_json(indent=4, ensure_ascii=False ) | indent(8, False) }}
+  }
+}

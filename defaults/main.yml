@@ -6,6 +6,7 @@
 kea_dhcp4_enabled: true
 kea_dhcp6_enabled: false
 kea_ctrl_agent_enabled: false
+kea_ddns_enabled: false
 
 # Base directory for all files
 kea_container_base_dir: "/srv/kea"
@@ -31,6 +32,17 @@ kea_ctrl_agent_container_networks:
   - name: bridge
 kea_ctrl_agent_container_ports:
   - "{{ kea_ctrl_agent_port }}:{{ kea_ctrl_agent_port }}"
+
+# The DDNS service
+kea_ddns_container_name: "kea-ddns"
+kea_ddns_container_image: "jonasal/kea-dhcp-ddns:3"
+kea_ddns_container_command: "-c /kea/config/ddns.json"
+
+kea_ddns_container_use_host_network: false
+kea_ddns_container_networks:
+  - name: bridge
+kea_ddns_container_ports:
+  - "{{ kea_ddns_port }}:{{ kea_ddns_port }}"
 
 #
 # DHCP configuration
@@ -82,6 +94,12 @@ kea_ctrl_agent_host: "0.0.0.0"
 kea_ctrl_agent_port: 8000
 
 #
+# DDNS configuration
+#
+kea_ddns_host: "127.0.0.1"
+kea_ddns_port: 53001
+
+#
 # Logging
 #
 
@@ -128,6 +146,18 @@ kea_logging_raw_ctrl_agent:
       - output: "stdout"
         pattern: "{{ kea_logging_pattern }}"
       - output: "/kea/logs/ctrl-agent.log"
+        pattern: "{{ kea_logging_pattern }}"
+        maxsize: "{{ kea_logging_maxsize }}"
+        maxver: "{{ kea_logging_maxver }}"
+
+kea_logging_raw_ddns:
+  - name: "kea-ddns"
+    severity: "{{ kea_logging_severity }}"
+    debuglevel: "{{ kea_logging_debuglevel }}"
+    output_options:
+      - output: "stdout"
+        pattern: "{{ kea_logging_pattern }}"
+      - output: "/kea/logs/ddns.log"
         pattern: "{{ kea_logging_pattern }}"
         maxsize: "{{ kea_logging_maxsize }}"
         maxver: "{{ kea_logging_maxver }}"

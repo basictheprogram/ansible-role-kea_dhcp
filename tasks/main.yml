@@ -36,8 +36,7 @@
     - name: Copy Control Agent configuration files
       ansible.builtin.template:
         src: "{{ item }}"
-        dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '')
-          }}"
+        dest: "{{ kea_container_base_dir }}/config/{{ item | regex_replace('.j2', '') }}"
         owner: "root"
         group: "101"
         mode: "0664"
@@ -68,9 +67,10 @@
           - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
         comparisons:
           networks: strict
-        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool |
-          ternary('host', omit) }}"
-        networks: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit,
-          kea_ctrl_agent_container_networks) }}"
-        published_ports: "{{ kea_ctrl_agent_container_use_host_network | bool |
-          ternary(omit, kea_ctrl_agent_container_ports) }}"
+        network_mode: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary('host', omit) }}"
+        networks: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_networks) }}"
+        published_ports: "{{ kea_ctrl_agent_container_use_host_network | bool | ternary(omit, kea_ctrl_agent_container_ports) }}"
+
+- name: Deploy the DDNS services
+  ansible.builtin.include_tasks: deploy_ddns.yml
+  when: kea_ddns_enabled

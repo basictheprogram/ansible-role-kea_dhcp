@@ -2,3 +2,8 @@
   ansible.builtin.command: "docker kill --signal=HUP {{ kea_ctrl_agent_container_name }}"
   changed_when: true
   when: kea_ctrl_agent_enabled
+
+- name: "Reload Kea DDNS Service"
+  ansible.builtin.command: "docker kill --signal=HUP {{ kea_ddns_container_name }}"
+  changed_when: true
+  when: kea_ddns_enabled
