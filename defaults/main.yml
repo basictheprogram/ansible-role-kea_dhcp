@@ -40,7 +40,7 @@ kea_ddns_container_command: "-c /kea/config/ddns.json"
 
 kea_ddns_container_use_host_network: false
 kea_ddns_container_networks:
-  - name: bridge
+  - name: kea_net
 kea_ddns_container_ports:
   - "{{ kea_ddns_port }}:{{ kea_ddns_port }}"
 
@@ -86,18 +86,21 @@ kea_dhcp6_rebind_timer: "{{ kea_dhcp_rebind_timer }}"
 kea_dhcp4_subnets: []
 kea_dhcp6_subnets: []
 
-#
 # Control Agent configuration
-#
-
 kea_ctrl_agent_host: "0.0.0.0"
 kea_ctrl_agent_port: 8000
 
-#
 # DDNS configuration
-#
 kea_ddns_host: "127.0.0.1"
-kea_ddns_port: 53001
+kea_ddns_port: 53001/udp
+
+# Install Python dependencies required by community.docker modules on
+# managed hosts.
+kea_install_docker_python_dependencies: true
+kea_docker_python_packages_map:
+  default:
+    - python3-requests
+    - python3-docker
 
 #
 # Logging

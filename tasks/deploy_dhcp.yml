@@ -1,3 +1,8 @@
+---
+- name: Copy keys to Kea configuration directory
+  ansible.builtin.include_tasks: key_management.yml
+  when: kea_ddns_enabled
+
 - name: "Copy Kea DHCP{{ outer_item.dhcp_ip_version }} configuration files"
   ansible.builtin.template:
     src: "{{ item }}"

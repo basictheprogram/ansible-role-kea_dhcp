@@ -1,3 +1,10 @@
+---
+- name: Create Kea DDNS Docker network
+  community.docker.docker_network:
+    name: "{{ item.name }}"
+  loop: "{{ kea_ddns_container_networks | default([]) }}"
+  when: item.name | default('') | length > 0
+
 - name: Deploy the Kea DDNS service
   when: kea_ddns_enabled
   block:
@@ -10,7 +17,7 @@
         mode: "0664"
       loop:
         - "ddns.json.j2"
-      notify: Reload Kea DDNS Service
+      notify: Reload Kea DDNS Container
 
     - name: Pull Kea DDNS image
       community.docker.docker_image:
@@ -33,6 +40,7 @@
         volumes:
           - "{{ kea_container_base_dir }}/config:/kea/config:ro"
           - "{{ kea_container_base_dir }}/sockets:/kea/sockets"
+          - "{{ kea_container_base_dir }}/logs:/kea/logs"
         comparisons:
           networks: strict
         network_mode: "{{ kea_ddns_container_use_host_network | bool | ternary('host', omit) }}"

@@ -2,8 +2,7 @@
     "Dhcp4": {
         "interfaces-config": {
             "interfaces": {{ kea_dhcp4_interfaces | to_nice_json(indent=4, ensure_ascii=False ) | indent(12, False) }},
-            "dhcp-socket-type": "raw",
-            "open-sockets-max-retries": {{ kea_dhcp4_open_sockets_max_retries | int }}
+            "dhcp-socket-type": "raw"
         },
 
 {% if kea_ctrl_agent_enabled %}
@@ -12,8 +11,31 @@
             "socket-type": "unix",
             "socket-name": "/kea/sockets/dhcp4.socket"
         },
-
 {% endif %}
+
+{% if kea_ddns_enabled %}
+        "dhcp-ddns": {
+            // Connectivity parameters
+            "enable-updates": {{ kea_ddns['enable-updates'] | bool | to_json}},
+            "server-ip": "{{ kea_ddns['server-ip'] | default('127.0.0.1') }}",
+            "server-port": {{ kea_ddns['server-port'] | default(53001) | int }},
+            "sender-ip": "{{ kea_ddns['sender-ip'] | default('') }}",
+            "sender-port": {{ kea_ddns['sender-port'] | default(0) | int }}
+        },
+
+        // Behavioral parameters (global)
+        "ddns-send-updates": {{ kea_ddns['send-updates'] | default(true) | bool | to_json }},
+        "ddns-override-no-update": {{ kea_ddns['override-no-update'] | default(false) | bool | to_json }},
+        "ddns-override-client-update": {{ kea_ddns['override-client-update'] | default(false) | bool | to_json }},
+        "ddns-replace-client-name": "{{ kea_ddns['replace-client-name'] | default('never') }}",
+        "ddns-generated-prefix": "{{ kea_ddns['generated-prefix'] | default('myhost') }}",
+        "ddns-qualifying-suffix": "{{ kea_ddns['qualifying-suffix'] | default('') }}",
+        "ddns-update-on-renew": {{ kea_ddns['update-on-renew'] | bool | to_json }},
+        "ddns-conflict-resolution-mode": "{{ kea_ddns['conflict-resolution-mode'] | default('check-with-dhcid') }}",
+        "hostname-char-set": "{{ kea_ddns['hostname-char-set'] | default('') }}",
+        "hostname-char-replacement": "{{ kea_ddns['hostname-char-replacement'] | default('') }}",
+{% endif %}
+
         // Specifies credentials to access lease database.
         "lease-database": {
             "type": "memfile",

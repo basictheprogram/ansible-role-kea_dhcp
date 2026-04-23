@@ -1,3 +1,4 @@
+---
 - name: "Create expected folders"
   ansible.builtin.file:
     state: directory
@@ -12,6 +13,12 @@
     - "{{ kea_container_base_dir }}/logs"
     - "{{ kea_container_base_dir }}/sockets"
     - "{{ kea_container_base_dir }}/entrypoint.d"
+
+- name: Ensure Python dependencies for community.docker are installed
+  ansible.builtin.package:
+    name: "{{ kea_docker_python_packages_map[ansible_facts['os_family']] | default(kea_docker_python_packages_map['default']) }}"
+    state: present
+  when: kea_install_docker_python_dependencies | bool
 
 - name: Deploy the DHCP services
   ansible.builtin.include_tasks: deploy_dhcp.yml
